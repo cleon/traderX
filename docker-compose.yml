@@ -1,5 +1,3 @@
-version: '3.4'
-
 services:
   database:
     restart: always
@@ -18,9 +16,9 @@ services:
       - 18082:18082
       - 18083:18083
       - 18084:18084
-    volumes:
+    # volumes:
       # Mount the root folder that contains .git
-      - .:/workspace:cached
+      # - .:/workspace:cached
     command: ./run.sh
     networks:
       - localnet
@@ -30,15 +28,15 @@ services:
     build:
       context: reference-data
       dockerfile: Dockerfile
-    working_dir: /reference-data
+    working_dir: /usr/src/app
     expose:
       - 18085
     ports:
       - 18085:18085
-    volumes:
+    # volumes:
       # Mount the root folder that contains .git
-      - .:/workspace:cached
-    command: npm run start
+      #- .:/workspace:cached
+    # command: npm run start
     networks:
       - localnet
   trade-feed:
@@ -47,14 +45,14 @@ services:
     build:
       context: trade-feed
       dockerfile: Dockerfile
-    working_dir: /trade-feed
+    working_dir: /usr/src/app
     expose:
       - 18086
     ports:
       - 18086:18086
-    volumes:
+    # volumes:
       # Mount the root folder that contains .git
-      - .:/workspace:cached
+      # - .:/workspace:cached
     command: npm run start
     networks:
       - localnet
@@ -64,14 +62,14 @@ services:
     build:
       context: people-service
       dockerfile: Dockerfile
-    working_dir: /people-service
+    # working_dir: /people-service
     expose:
       - 18089
     ports:
       - 18089:18089
-    volumes:
+    # volumes:
       # Mount the root folder that contains .git
-      - .:/workspace:cached
+      # - .:/workspace:cached
     command: /PeopleService.WebApi dotnet run
     networks:
       - localnet
