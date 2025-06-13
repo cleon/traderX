@@ -1,6 +1,10 @@
 {
-	"image": "mcr.microsoft.com/devcontainers/universal:2",
+	"name": "Default Linux Universal",
+	"dockerComposeFile": ["../docker-compose.yml"],
+	"service": "account-service",
+	"workspaceFolder": "/workspace",
 	"features": {
-		"ghcr.io/devcontainers-contrib/features/gradle-sdkman:2": {}
+		"ghcr.io/devcontainers-extra/features/springboot-sdkman:2": {},
+		"ghcr.io/devcontainers/features/git:1": {} 
 	}
 }
