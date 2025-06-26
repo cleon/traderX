@@ -17,7 +17,8 @@ public class ReferenceDataService {
     @Value("${reference.data.service.url}")
     private String referenceDataServiceAddress;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    @Autowired
+    private RestTemplate restTemplate;
 
     public boolean validateTicker(String ticker) {
         String url = this.referenceDataServiceAddress.replaceAll("/+$", "") + "/stocks/" + ticker;
