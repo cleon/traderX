@@ -21,6 +21,8 @@ import finos.traderx.tradeservice.model.Security;
 import finos.traderx.tradeservice.model.TradeOrder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import finos.traderx.tradeservice.service.ReferenceDataService;
+import finos.traderx.tradeservice.service.AccountService;
 
 @CrossOrigin("*")
 @RestController
@@ -31,25 +33,23 @@ public class TradeOrderController {
 
 	@Autowired
 	private Publisher<TradeOrder> tradePublisher;
-	
-	private RestTemplate restTemplate = new RestTemplate();
 
-	@Value("${reference.data.service.url}")
-	private String referenceDataServiceAddress;
+	@Autowired
+	private ReferenceDataService referenceDataService;
 
-	@Value("${account.service.url}")
-	private String accountServiceAddress;
+	@Autowired
+	private AccountService accountService;
 
 	@Operation(description = "Submit a new trade order")
 	@PostMapping("/")
 	public ResponseEntity<TradeOrder> createTradeOrder(@Parameter(description = "the intendeded trade order") @RequestBody TradeOrder tradeOrder) {
 		log.info("Called createTradeOrder");
 		
-		if (!validateTicker(tradeOrder.getSecurity())) 
+		if (!referenceDataService.validateTicker(tradeOrder.getSecurity())) 
 		{
 			throw new ResourceNotFoundException(tradeOrder.getSecurity() + " not found in Reference data service.");
 		}
-		else if(!validateAccount(tradeOrder.getAccountId()))
+		else if(!accountService.validateAccount(tradeOrder.getAccountId()))
 		{
 			throw new ResourceNotFoundException(tradeOrder.getAccountId() + " not found in Account service.");
 		}
@@ -65,51 +65,7 @@ public class TradeOrderController {
 		}
 	}
 
-	private boolean validateTicker(String ticker)
-	{
-		// Move whole method to a sperate class that handles all reference data 
-		// so we can mock it and run without this service up.
-		String url = this.referenceDataServiceAddress + "//stocks/" + ticker;
-		ResponseEntity<Security> response = null;
-
-		try {
-			response = this.restTemplate.getForEntity(url, Security.class);
-			log.info("Validate ticker " + response.getBody().toString());
-			return true;
-		}
-		catch (HttpClientErrorException ex) {
-			if (ex.getRawStatusCode() == 404) {
-				log.info(ticker + " not found in reference data service.");
-			}
-			else {
-				log.error(ex.getMessage());
-			}
-			return false;
-		}
-	}		
+		
 	
-	private boolean validateAccount(Integer id)
-	{
-		// Move whole method to a sperate class that handles all accounts 
-		// so we can mock it and run without this service up.
 
-		String url = this.accountServiceAddress + "//account/" + id;
-		ResponseEntity<Account> response = null;
-
-		try 
-		{
-				response = this.restTemplate.getForEntity(url, Account.class);
-				log.info("Validate account " + response.getBody().toString());
-				return true;
-		}
-		catch (HttpClientErrorException ex) {
-			if (ex.getRawStatusCode() == 404) {
-				log.info("Account" + id + " not found in account service.");				
-			}
-			else {
-				log.error(ex.getMessage());
-			}
-			return false;
-		}
-	}
 }
